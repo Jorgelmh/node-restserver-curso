@@ -1,8 +1,12 @@
 require('./config/config')
+require('./routes/usuario')
 
 const express = require('express')
-const app = express()
+
 const bodyParser = require('body-parser')
+const mongoose = require('mongoose')
+
+const app = express()
 
 /* MIDDLEWARES */
 
@@ -12,43 +16,15 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
 
-app.get('/', (req, res) =>{
-    res.json('Hello world')
-})
 
-app.get('/usuarios', (req, res) =>{
-    res.json('Get usuarios')
-})
+//User routes
+app.use(require('./routes/usuario'))
 
-app.post('/usuarios', (req, res) => {
 
-    let body = req.body
+mongoose.connect(process.env.URLDB, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true  } ,(err, res) => {
+    if(err) throw err;
 
-    if(body.nombre === undefined){
-        res.status(400).json({
-            ok: false,
-            message: 'El nombre es necesario'
-        })
-    }else{
-        res.json({
-            body
-        })
-    }
-
-    
-})
-
-app.put('/usuarios/:id', (req, res) => {
-
-    let id = req.params.id
-
-    res.json({
-        id,
-    })
-})
-
-app.delete('/usuarios', (req, res) => {
-    res.json('delete usuarios')
+    console.log('Base de datos online', process.env.URLDB);
 })
 
 app.listen(process.env.PORT, () =>{

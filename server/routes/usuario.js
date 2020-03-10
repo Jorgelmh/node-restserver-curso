@@ -6,11 +6,15 @@ const _ = require('underscore')
 const app = express()
 const Usuario = require('../models/usuario')
 
+//Middlewares
+
+const { verificaToken, verificaAdmin } = require('../middlewares/authentication')
+
 app.get('/', (req, res) =>{
     res.json('Hello world')
 })
 
-app.get('/usuarios', (req, res) =>{
+app.get('/usuarios', verificaToken ,(req, res) =>{
 
     let desde = req.query.desde || 0
     desde = Number(desde)
@@ -42,7 +46,7 @@ app.get('/usuarios', (req, res) =>{
 
 })
 
-app.post('/usuarios', (req, res) => {
+app.post('/usuarios', [verificaToken, verificaAdmin] , (req, res) => {
 
     let body = req.body
 
@@ -70,7 +74,7 @@ app.post('/usuarios', (req, res) => {
     });
 })
 
-app.put('/usuarios/:id', (req, res) => {
+app.put('/usuarios/:id',  [verificaToken, verificaAdmin], (req, res) => {
 
     let id = req.params.id
     let body = _.pick(req.body, ['nombre', 'email', 'img', 'role', 'estado']);
@@ -91,7 +95,7 @@ app.put('/usuarios/:id', (req, res) => {
     })  
 })
 
-app.delete('/usuarios/:id', (req, res) => {
+app.delete('/usuarios/:id',  [verificaToken, verificaAdmin],(req, res) => {
     let id = req.params.id
 
 
